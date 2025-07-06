@@ -7,7 +7,7 @@ rm(list = ls())
 renv::restore()
 
 # load packages
-list.packages <-  c("sf", "tidyverse", "terra", "ggplot2", "stars", "ggmosaic", "mgcv", "pROC", "parallel", "sperrorest")
+list.packages <-  c("sf", "tidyverse", "terra", "stars", "ggmosaic", "mgcv", "pROC", "parallel", "sperrorest")
 vapply(list.packages, library, logical(1), character.only = TRUE, logical.return = TRUE, quietly = TRUE)
 rm(list.packages)
 
