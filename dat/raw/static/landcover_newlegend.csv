@@ -1,0 +1,15 @@
+id,old,description,new,trivial
+1,0,Clouds,NA,NA
+2,62,Artificial surfaces and constructions,NA,NA
+3,73,Cultivated areas,2,1
+4,75,Vineyards,2,1
+5,82,Broadleaf tree cover,3,1
+6,83,Coniferous tree cover,4,1
+7,102,Herbaceous vegetation,5,1
+8,103,Moors and Heathland,5,1
+9,104,Sclerophyllous vegetation,5,1
+10,105,Marshes,6,1
+11,106,Peatbogs,6,1
+12,121,Natural material surfaces,NA,NA
+13,123,Permanent snow covered surfaces,NA,NA
+14,162,Water bodies,NA,NA
