@@ -256,8 +256,8 @@ ggplot2::ggplot(cv, aes(auc, type)) + geom_boxplot(width = 0.5) +
   ylab("") + xlab ("AUC")+
   coord_flip()+
   theme_plot()
+# ggsave("./plt/07_rcv_scv.pdf", width = 7, height = 8, dpi = 300, units = "in", device='pdf')
 
-# ggsave("./FIGURES/rcvandscv.pdf", width = 7, height = 8, dpi = 300, units = "in", device='pdf')
 
 ## LAND COVER ----
 
@@ -270,8 +270,7 @@ ggplot(myroc_lcv, aes(x=landcover, y=auc)) + geom_bar(stat="identity", width=0.8
   xlab("Land cover") + ylab("AUC") + ggtitle(paste("mean AUC:", round(mean(myroc_lcv$auc),3))) +
   coord_cartesian(ylim=c(0.60,1)) +
   theme_plot()
-
-# ggsave("./FIGURES/landcovercv.pdf", width = 7, height = 8, dpi = 300, units = "in", device='pdf')
+# ggsave("./plt/08_cv_landcover.pdf", width = 7, height = 8, dpi = 300, units = "in", device='pdf')
 
 
 ## MONTH ----
@@ -284,8 +283,7 @@ ggplot(myroc_mcv, aes(x=as.factor(month), y=auc)) + geom_bar(stat="identity", wi
   xlab("Month") + ylab("AUC") + ggtitle(paste("mean AUC:", round(mean(myroc_mcv$auc),3))) +
   coord_cartesian(ylim=c(0.60,1)) +
   theme_plot()
-
-# ggsave("./FIGURES/monthcv.pdf", width = 7, height = 8, dpi = 300, units = "in", device='pdf')
+# ggsave("./plt/09_cv_month.pdf", width = 7, height = 8, dpi = 300, units = "in", device='pdf')
 
 
 ## YEAR ----
@@ -298,6 +296,5 @@ ggplot(myroc_ycv, aes(x=as.factor(year), y=auc)) + geom_bar(stat="identity", wid
   xlab("Year") + ylab("AUC") + ggtitle(paste("mean AUC:", round(mean(myroc_ycv$auc),3))) +
   coord_cartesian(ylim=c(0.60,1)) +
   theme_plot()
-
-# ggsave("./FIGURES/yearcv.pdf", width = 7, height = 8, dpi = 300, units = "in", device='pdf')
+# ggsave("./plt/10_cv_year.pdf", width = 7, height = 8, dpi = 300, units = "in", device='pdf')
 

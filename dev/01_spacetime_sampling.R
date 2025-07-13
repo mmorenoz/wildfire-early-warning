@@ -175,7 +175,7 @@ for (x in locid){
   }
   d_bin0_filtered_days <- rbind(d_bin0_filtered_days, d_bin0_temp)
 }
-b <- Sys.time()-a; b #~30 min
+b <- Sys.time()-a; b #TODO
 
 # clean up
 rm(x, y, date_ite, datebin0, locid, d_bin0_temp, a, b)
@@ -437,5 +437,5 @@ d <- d %>%
 
 
 # store
-saveRDS(d, "./dat/interim/spacetime_sampling.Rds") # 2 absence dates at presence locations
+# saveRDS(d, "./dat/interim/spacetime_sampling.Rds") # 2 absence dates at presence locations
 

@@ -47,7 +47,7 @@ month_freq <- function(d) {
   ggplot(d, aes(x=as.factor(month), y = after_stat(count), fill = forcats::fct_relevel(bin, "1", "0"))) + geom_bar(width = 0.7) +
     coord_cartesian(ylim= c(0, 600)) + ylab("") + xlab("Month") +
     stat_count(geom = "text", colour = "black", size = 4, aes(label = after_stat(count)),position=position_stack(vjust=0.5))+
-    ggtitle("Wildfire presences-absences (Month)") + # less samples in 2012 since it starts from April
+    ggtitle("Wildfire presences-absences (Month)") +
     scale_fill_discrete(name="", labels=c(paste("Presences:", paste(sum(d$bin==1))), paste("Absences:", paste(sum(d$bin==0))))) +
     theme_plot() + theme(legend.box.background = element_rect(color="black", linewidth=0.3),
                          legend.box.margin = margin(1, 1, 1, 1),
@@ -58,7 +58,7 @@ year_freq <- function(d) {
   ggplot(d, aes(x=as.factor(year), y = after_stat(count), fill = forcats::fct_relevel(bin, "1", "0"))) + geom_bar(width = 0.7) +
     coord_cartesian(ylim= c(0, 350)) + ylab("") + xlab("Year") +
     stat_count(geom = "text", colour = "black", size = 4, aes(label = after_stat(count)),position=position_stack(vjust=0.5))+
-    ggtitle("Wildfire presences-absences (MYear)") + # less samples in 2012 since it starts from April
+    ggtitle("Wildfire presences-absences (Year)") + 
     scale_fill_discrete(name="", labels=c(paste("Presences:", paste(sum(d$bin==1))), paste("Absences:", paste(sum(d$bin==0))))) +
     theme_plot() + theme(legend.box.background = element_rect(color="black", linewidth=0.3),
                          legend.box.margin = margin(1, 1, 1, 1),
@@ -79,7 +79,7 @@ grids <- terra::rast(grids); names(grids) <- name_grids
 rm(name_grids)
 
 # space-time sampling
-d <- readRDS("./dat/interim/spacetime_sampling.Rds") %>% dplyr::mutate(bin = forcats::fct_relevel(bin, "0", "1")) %>% tidyr::drop_na(P0, landcover)
+d <- readRDS("./dat/interim/spacetime_sampling.Rds") %>% dplyr::mutate(bin = forcats::fct_relevel(bin, "0", "1")) 
 
 
 # ACCUMULATE PRECIPITATION ----
@@ -95,10 +95,7 @@ d <-  dplyr::mutate(d, year = format(date_corr, format="%Y")) %>%
   dplyr::mutate(wday = dplyr::if_else(dow == "Saturday" | dow == "Sunday", "Weekend", "Working")) %>% 
   dplyr::relocate(c(month_name, dow, wday), .after = doy) %>% 
   dplyr::mutate_at(vars(year, month_name, dow, wday, hour, initiation_place,
-                        vegetation_type, orography, ignition, cause, type), as.factor) %>% 
-  dplyr::mutate(provinces = dplyr::if_else(provinces == 0, NA, provinces)) %>% 
-  tidyr::drop_na(provinces) %>% 
-  dplyr::mutate(provinces = droplevels(provinces)) 
+                        vegetation_type, orography, ignition, cause, type), as.factor) 
 
 # separating temperature and precipitation to produce cumulative values
 d_precipitation <- dplyr::select(d, c(id_obs, dplyr::matches("P\\d{1,2}"))) %>% sf::st_drop_geometry()
@@ -118,18 +115,25 @@ rm(d_rest, d_precipitation)
 
 # exclude rainy days during the wildfire occurrence
 # 1.1 mm at the day of occurrence P0
-d_filtered <- dplyr::filter(d, P0 < 1.1) # using shifted dates, it covers from 08:00 of the day after occurrence to 08:00 of the occurrence day
-# saveRDS(d_filtered, "./dat/processed/spacetime_sampling_filtered.Rds")
+d_filtered <- dplyr::filter(d, P0 < 1.1) 
 
 # comparison plot
-plot(gridExtra::arrangeGrob(
-  year_freq(d),
-  year_freq(d_filtered),
-  ncol=2, nrow=1))
+fig <- gridExtra::arrangeGrob(
+  month_freq(d),
+  month_freq(d_filtered),
+  ncol=2, nrow=1);plot(fig)
+# ggsave("./plt/01_monthly_distribution.pdf", fig, dpi = 500, height = 20, width = 40, units = "cm")
 
 # keep filtered data
-d <- d_filtered
-rm(d_filtered)
+d <- d_filtered %>% 
+  dplyr::mutate(provinces = dplyr::if_else(provinces == 0, NA, provinces)) %>% 
+  tidyr::drop_na(provinces) %>% 
+  dplyr::mutate(provinces = droplevels(provinces)) %>%
+  tidyr::drop_na(P0, landcover)
+rm(d_filtered, fig)
+
+# store
+# saveRDS(d, "./dat/processed/spacetime_sampling_filtered.Rds")
 
 
 # TEMPORAL CV MODEL -------------------------------------------------------
@@ -145,20 +149,17 @@ grid <- data.frame(i = rep(1:341, each = 100),
                    j = rep(rep(1:10, each= 10), times=341),
                    k = rep(1:10, times = 3410))
 
-# optimal time window based on predictive performance
-
+# force parallel to use only 1 thread per process
+Sys.setenv(OMP_NUM_THREADS = "1")
+Sys.setenv(MKL_NUM_THREADS = "1")
+Sys.setenv(NUMEXPR_NUM_THREADS = "1")
+Sys.setenv(OPENBLAS_NUM_THREADS = "1")
 
 # parallel settings
 n_cores <- max(1, parallel::detectCores() - 6)
 clust = parallel::makeCluster(n_cores)
 result_auc = list()
 parallel::clusterExport(cl = clust, varlist = c("myoptimal", "d", "resamp", "grid"))
-
-# force parallel to use only 1 thread per process
-Sys.setenv(OMP_NUM_THREADS = "1")
-Sys.setenv(MKL_NUM_THREADS = "1")
-Sys.setenv(NUMEXPR_NUM_THREADS = "1")
-Sys.setenv(OPENBLAS_NUM_THREADS = "1")
 
 # parallel loop
 set.seed(1) 
@@ -218,7 +219,7 @@ ggplot(myoptimal, aes(y = temperature, x = precipitation, fill = auc_mean))+
   ylab("Day-window mean temperature") +
   guides(fill = guide_colourbar(barwidth = 30, barheight = 1, title = "AUROC")) +
   theme_plot() + theme(legend.position = "bottom")
-# ggsave("./FIGURES/optwinCV.pdf", dpi = 500, height = 20, width = 30, units = "cm")
+# ggplot2::ggsave("./plt/02_gridsearch_cv.pdf", dpi = 500, height = 20, width = 30, units = "cm")
 
 
 
