@@ -108,6 +108,9 @@ my_exclude <- c("s(year)")
 d$prob <- predict(fit, d, "response", exclude = my_exclude); summary(d$prob)
 roc_bin <- pROC::roc(d$bin, d$prob);roc_bin
 
+# store environment data
+# save.image("./dat/processed/fit.Rda")
+
 
 # VARIABLE IMPORTANCE -----------------------------------------------------
 
@@ -254,10 +257,10 @@ my_exclude = c("s(distbuildings)", "s(mean_precipitation)",
   "s(year)")
 
 # different combinations of factors
-threshold1 <- threshold_predictor(doy_value = 30, aspect_value = 0, treecover_value = 30)
-threshold2 <- threshold_predictor(doy_value = 240, aspect_value = 0, treecover_value = 30)
-threshold3 <- threshold_predictor(doy_value = 30, aspect_value = 225, treecover_value = 100)
-threshold4 <- threshold_predictor(doy_value = 240, aspect_value = 225, treecover_value = 100)
+threshold1 <- threshold_predictor(doy_value = 30, aspect_value = 225, treecover_value = 30)
+threshold2 <- threshold_predictor(doy_value = 240, aspect_value = 225, treecover_value = 30)
+threshold3 <- threshold_predictor(doy_value = 30, aspect_value = 0, treecover_value = 100)
+threshold4 <- threshold_predictor(doy_value = 240, aspect_value = 0, treecover_value = 100)
 
 # predictions
 threshold1$prob <- predict(fit, type="response", newdata.guaranteed=TRUE, newdata=threshold1, exclude = my_exclude)

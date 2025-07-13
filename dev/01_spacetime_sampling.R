@@ -175,7 +175,7 @@ for (x in locid){
   }
   d_bin0_filtered_days <- rbind(d_bin0_filtered_days, d_bin0_temp)
 }
-b <- Sys.time()-a; b #TODO
+b <- Sys.time()-a; b #21 min
 
 # clean up
 rm(x, y, date_ite, datebin0, locid, d_bin0_temp, a, b)
