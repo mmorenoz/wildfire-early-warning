@@ -73,7 +73,7 @@ d <- readRDS("./dat/processed/spacetime_sampling_filtered.Rds") %>% dplyr::mutat
 
 # MODELED RELATIONSHIPS ---------------------------------------------------
 
-# values above do not relate to wildfire occurrence
+# values above or below do not substantially affect wildfire occurrence
 d <- d %>% 
   dplyr::mutate(distbuildings = dplyr::if_else(distbuildings > 4000, 4000, distbuildings)) %>% 
   dplyr::mutate(distroads = dplyr::if_else(distroads > 1000, 1000, distroads)) %>% 
@@ -98,18 +98,15 @@ formula <- bin ~
 fit <- mgcv::gam(formula, data=d, family=binomial, select = TRUE, method = "REML");summary(fit)
 
 # plot partial effects
-# pdf("./plt/03_partial_effects.pdf", width = 11, height = 8, paper ="a4r")
+pdf("./plt/partialplots.pdf", width = 11, height = 8, paper ="a4r")
 par(mfrow = c(3,4));par(pty="s")
 plot(fit, pages=1, all.terms=T, trans=plogis, ylim = c(0,1), shade = T, shade.col = "grey", cex.lab = 1.5, cex.axis = 1.5)
-# dev.off()
+dev.off()
 
 # predictions and fitting performance
 my_exclude <- c("s(year)")
 d$prob <- predict(fit, d, "response", exclude = my_exclude); summary(d$prob)
 roc_bin <- pROC::roc(d$bin, d$prob);roc_bin
-
-# store environment data
-# save.image("./dat/processed/fit.Rda")
 
 
 # VARIABLE IMPORTANCE -----------------------------------------------------
@@ -166,8 +163,6 @@ perm_results <- do.call(rbind, prop.dev.perm) %>%
   summarise(
     mean_dev = mean(prop.dev, na.rm =TRUE),
     sd_dev = sd(prop.dev, na.rm = TRUE))
-
-# clean up
 rm(dev.increase, formula.terms, formula.vars, d.perm, mod.null, mod.perm,
    i, j, n.permut, term, term.name, prop.dev.perm, prop.dev, mod)
 
@@ -178,7 +173,7 @@ ggplot(perm_results, aes(x = reorder(term, mean_dev), y =mean_dev)) +
   labs(x = "", y = "Permutation variable importance (deviance explained)") +
   coord_flip() +
   theme_plot()
-# ggsave("./plt/04_variable_importance.pdf", dpi = 300, height = 20, width = 30, units = "cm")
+# ggsave("./plt/varimp.pdf", dpi = 300, height = 20, width = 30, units = "cm")
 
 
 # THRESHOLDING ------------------------------------------------------------
@@ -244,7 +239,7 @@ ggplot(data=d_threshold) +
   annotate(geom="text", x=75, y=21.5, angle = 25, label=paste0("Optimal (TNR", round(t[1,2],2)*100, " TPR", round(t[1,3],2)*100,")"), col="#C62527") +
   annotate(geom="text", x=75, y=10.5, angle = 25, label=paste0("TNR", round(t[2,2],2)*100, " TPR", round(t[2,3],2)*100),   col="#0D9B58") +
   annotate(geom="text", x=75, y=32.5, angle = 25, label=paste0("TNR", round(t[3,2],2)*100, " TPR", round(t[3,3],2)*100),   col="#5A5F94")
-# ggsave("./plt/05_threshold.pdf", dpi = 300, height = 15, width = 15, units = "cm")
+# ggsave("./plt/threshold.pdf", dpi = 300, height = 15, width = 15, units = "cm")
 
 # clean up
 rm(d_bin0, d_bin1, d_threshold)
@@ -257,10 +252,10 @@ my_exclude = c("s(distbuildings)", "s(mean_precipitation)",
   "s(year)")
 
 # different combinations of factors
-threshold1 <- threshold_predictor(doy_value = 30, aspect_value = 225, treecover_value = 30)
-threshold2 <- threshold_predictor(doy_value = 240, aspect_value = 225, treecover_value = 30)
-threshold3 <- threshold_predictor(doy_value = 30, aspect_value = 0, treecover_value = 100)
-threshold4 <- threshold_predictor(doy_value = 240, aspect_value = 0, treecover_value = 100)
+threshold1 <- threshold_predictor(doy_value = 30, aspect_value = 0, treecover_value = 30)
+threshold2 <- threshold_predictor(doy_value = 240, aspect_value = 0, treecover_value = 30)
+threshold3 <- threshold_predictor(doy_value = 30, aspect_value = 225, treecover_value = 100)
+threshold4 <- threshold_predictor(doy_value = 240, aspect_value = 225, treecover_value = 100)
 
 # predictions
 threshold1$prob <- predict(fit, type="response", newdata.guaranteed=TRUE, newdata=threshold1, exclude = my_exclude)
@@ -276,5 +271,5 @@ threshold4 <- plot_threshold(threshold4, t$threshold[1])
 
 # combined plots
 pm <- gridExtra::grid.arrange(threshold1, threshold2, threshold3, threshold4, ncol=2, nrow = 2)
-# ggsave("./plt/06_threshold_examples.pdf", pm, dpi = 500, height = 20, width = 20, units = "cm")
+# ggsave("./plt/thresholdseason.pdf", pm, dpi = 500, height = 20, width = 20, units = "cm")
 
