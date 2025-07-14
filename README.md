@@ -7,7 +7,7 @@ Stefano Terzi<sup>[![](https://info.orcid.org/wp-content/uploads/2020/12/orcid_1
 Andrea Trucchia <sup>[![](https://info.orcid.org/wp-content/uploads/2020/12/orcid_16x16.gif)](https://orcid.org/0000-0001-7294-9061)</sup>,
 Cees van Westen <sup>[![](https://info.orcid.org/wp-content/uploads/2020/12/orcid_16x16.gif)](https://orcid.org/0000-0002-2992-902X)</sup> and 
 Luigi Lombardo <sup>[![](https://info.orcid.org/wp-content/uploads/2020/12/orcid_16x16.gif)](https://orcid.org/0000-0003-4348-7288)</sup>.
-[![DOI](https://zenodo.org/badge/887347458.svg)](https://doi.org/10.5281/zenodo.15033256)
+[![DOI](https://zenodo.org/badge/1009020285.svg)](https://doi.org/10.5281/zenodo.15883349)
 
 > Moreno, M., Steger, S., Bozzoli, L., Terzi, S., Trucchia, A., van Westen, C. J. & Lombardo, L. (2025). Space-time data-driven modeling of wildfire initiation in the mountainous region of Trentino--South Tyrol, Italy. https://eartharxiv.org/repository/view/9257/
 
